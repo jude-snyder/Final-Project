@@ -82,6 +82,23 @@ async function loadQuestion() {
 
         btn.onclick = () => {
             Array.from(answersDiv.children).forEach(b => b.disabled = true);
-        }
-    })
+
+            if (track.artistName === correctTrack.artistName) {
+                result.textContent = "✅ Correct!";
+                score++;
+                streak++;
+            } else {
+                result.textContent = `❌ It was ${correctTrack.artistName}`;
+                streak = 0;
+            }
+
+            questionNumber++;
+
+            setTimeout(loadQuestion, 1500);
+        };
+
+        answersDiv.appendChild(btn);
+    });
 }
+
+loadQuestion();
