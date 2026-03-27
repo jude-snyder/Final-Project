@@ -72,7 +72,8 @@ async function loadQuestion() {
     tracks.sort(() => 0.5 - Math.random());
 
     if (tracks.length < 4) {
-        loadQuestion();
+        result.textContent = "⚠️ Couldn't load songs. Trying again...";
+        setTimeout(loadQuestion, 1000);
         return;
     }
 
@@ -81,6 +82,9 @@ async function loadQuestion() {
     usedTrackIds.add(correctTrack.trackId);
 
     player.src = correctTrack.previewUrl;
+    player.play().catch(() => {
+        result.textContent = "▶️ Click play to hear the song";
+    });
 
     const options = [];
     const usedArtists = new Set();
