@@ -6,7 +6,14 @@ const scoreText = document.getElementById("score");
 const streakText = document.getElementById("streak");
 const restartBtn = document.getElementById("restart");
 
-const GENRES = ["pop", "Christian Hip-Hop", "jazz", "alternative", "lofi"];
+const GENRES = [
+    "top hits",
+    "billboard hot 100",
+    "pop hits",
+    "2000s hits",
+    "2010s hits",
+    "throwback songs"
+];
 
 let usedTrackIds = new Set();
 let questionNumber = 0
@@ -42,20 +49,33 @@ async function loadQuestion() {
 
     const genre = GENRES[Math.floor(Math.random() * GENRES.length)];
 
+    const randomOffset = Math.floor(Math.random() * 100);
+
     const res = await fetch(
-        'https://itunes.apple.com/search?term=${genre}&entity=song&limit=50'
+        'https://itunes.apple.com/search?term=${encodeURIComponent(genre)}&entity=song&limit=50&offset=${randomOffset}'
     );
 
     const data = await res.json();
 
-    let tracks = data.results.filter(
-        t =>
-            t.previewUrl&&
+    let tracks = data.results.filter(t =>
+        t.wrapperType === "track" &&
+        t.kind === "song" &&
+        t.artistName &&
+        t.trackName &&
+        t.previewUrl &&
         t.trackExplicitness === "notExplicit" &&
+        t.artistName.length < 30 &&
+        t.trackName.length < 50 &&
         !usedTrackIds.has(t.trackId)
     );
 
     tracks.sort(() => 0.5 - Math.random());
+
+    if (tracks.length < 4) {
+        loadQuestion();
+        return;
+    }
+
 
     const correctTrack = tracks[0];
     usedTrackIds.add(correctTrack.trackId);
