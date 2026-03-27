@@ -36,5 +36,52 @@ async function loadQuestion() {
     result.textContent = "";
     answersDiv.innerHTML = "";
 
-    progress.textContent = `Question ${questionNumber + 1} / ${}`
+    progress.textContent = `Question ${questionNumber + 1} / ${totalQuestions}`;
+    scoreText.textContent = `Score: ${score}`;
+    streakText.textContent = `🔥 Streak: ${streak}`;
+
+    const genre = GENRES[Math.floor(Math.random() * GENRES.length)];
+
+    const res = await fetch(
+        'https://itunes.apple.com/search?term=${genre}&entity=song&limit=50'
+    );
+
+    const data = await res.json();
+
+    let tracks = data.results.filter(
+        t =>
+            t.previewUrl&&
+        t.trackExplicitness === "notExplicit" &&
+        !usedTrackIds.has(t.trackId)
+    );
+
+    tracks.sort(() => 0.5 - Math.random());
+
+    const correctTrack = tracks[0];
+    usedTrackIds.add(correctTrack.trackId);
+
+    player.src = correctTrack.previewUrl;
+
+    const options = [];
+    const usedArtists = new Set();
+
+    for (let track of tracks) {
+        if (!usedArtists.has(track.artistName)) {
+            options.push(track);
+            usedArtists.add(track.artistName);
+        }
+
+        if (options.length === 4) break;
+    }
+
+    options.sort(() => 0.5 - Math.random());
+
+    options.forEach(track => {
+        const btn = document.createElement("button");
+        btn.textContent = track.artistName;
+
+        btn.onclick = () => {
+            Array.from(answersDiv.children).forEach(b => b.disabled = true);
+        }
+    })
 }
