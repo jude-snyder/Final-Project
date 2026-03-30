@@ -6,24 +6,52 @@ const scoreText = document.getElementById("score");
 const streakText = document.getElementById("streak");
 const restartBtn = document.getElementById("restart");
 
-const GENRES = [
-  "billboard hot 100",
-  "top 40 hits",
-  "today's hits",
-  "pop radio hits",
-  "best pop songs",
-  "viral hits"
+// 🎯 POPULAR ARTISTS (radio-style)
+const ARTISTS = [
+  "Taylor Swift",
+  "Drake",
+  "The Weeknd",
+  "Ariana Grande",
+  "Ed Sheeran",
+  "Olivia Rodrigo",
+  "Dua Lipa",
+  "Justin Bieber",
+  "Harry Styles",
+  "Billie Eilish",
+  "Post Malone",
+  "Doja Cat",
+  "SZA",
+  "Khalid",
+  "Shawn Mendes",
+  "Maroon 5",
+  "Bruno Mars",
+  "Rihanna",
+  "Katy Perry",
+  "Imagine Dragons",
+  "Twenty One Pilots",
+  "Arctic Monkeys",
+  "Charlie Puth",
+  "David Guetta",
+  "OneRepublic",
+  "Marshmello",
+  "Juice WRLD",
+  "Coldplay",
+  "Benson Boone",
+  "HUNTR/X",
+  "Avicii",
+  "Weezer",
+  "Bastille"
 ];
 
-let usedTrackIds = new Set();
 let questionNumber = 0
 const totalQuestions = 10;
+let usedArtists = new Set();
 
 let score = 0;
 let streak = 0;
 
 function resetGame() {
-    usedTrackIds.clear();
+    usedArtists.clear();
     questionNumber = 0;
     score = 0;
     streak = 0;
@@ -47,84 +75,83 @@ async function loadQuestion() {
     scoreText.textContent = `Score: ${score}`;
     streakText.textContent = `🔥 Streak: ${streak}`;
 
-    const genre = GENRES[Math.floor(Math.random() * GENRES.length)];
+    let artist;
+    do {
+        artist = ARTISTS[Math.floor(Math.random() * ARTISTS.length)];
+    } while (usedArtists.has(artist));
 
-    const randomOffset = Math.floor(Math.random() * 100);
+    usedArtists.add(artist);
 
-    const res = await fetch(
-        `https://itunes.apple.com/search?term=${encodeURIComponent(genre)}&entity=song&limit=50&offset=${randomOffset}`
-    );
+    try {
+        const res = await fetch(
+            `https://itunes.apple.com/search?term=${encodeURIComponent(artist)}&entity=song&limit=25`
+        );
 
-    const data = await res.json();
+        const data = await res.json();
 
-    let tracks = data.results.filter(t =>
-        t.wrapperType === "track" &&
-        t.kind === "song" &&
-        t.artistName &&
-        t.trackName &&
-        t.previewUrl &&
-        t.trackExplicitness === "notExplicit" &&
-        t.primaryGenreName !== "Podcast" &&
-        t.artistName.length < 30 &&
-        t.trackName.length < 50 &&
-        !usedTrackIds.has(t.trackId) &&
-        !usedArtistsGlobal.has(t.artistName)
-    );
-
-    tracks.sort(() => 0.5 - Math.random());
-
-    if (tracks.length < 4) {
-        result.textContent = "⚠️ Couldn't load songs. Trying again...";
-        setTimeout(loadQuestion, 1000);
-        return;
-    }
-
-
-    const correctTrack = tracks[0];
-    usedTrackIds.add(correctTrack.trackId);
-
-    player.src = correctTrack.previewUrl;
-    player.play().catch(() => {
-        result.textContent = "▶️ Click play to hear the song";
-    });
-
-    const options = [];
-    const usedArtists = new Set();
-
-    for (let track of tracks) {
-        if (!usedArtists.has(track.artistName)) {
-            options.push(track);
-            usedArtists.add(track.artistName);
+        if (!data.results || data.results.length === 0) {
+            result.textContent = "⚠️ Couldn't load songs. Retrying...";
+            setTimeout(loadQuestion, 1000);
+            return;
         }
 
-        if (options.length === 4) break;
-    }
+        let tracks = data.results.filter(t =>
+            t.previewUrl &&
+            t.artistName &&
+            t.trackName &&
+            t.trackExplicitness === "notExplicit"
+        );
 
-    options.sort(() => 0.5 - Math.random());
+        if (tracks.length === 0) {
+            result.textContent = "⚠️ No playable songs. Retrying...";
+            setTimeout(loadQuestion, 1000);
+            return;
+        }
 
-    options.forEach(track => {
-        const btn = document.createElement("button");
-        btn.textContent = track.artistName;
+        const correctTrack = tracks[Math.floor(Math.random() * tracks.length)];
 
-        btn.onclick = () => {
-            Array.from(answersDiv.children).forEach(b => b.disabled = true);
+        player.src = correctTrack.previewUrl;
+        player.play().catch(() => {
+            result.textContent = "▶️ Click play to hear the song";
+        });
 
-            if (track.artistName === correctTrack.artistName) {
-                result.textContent = "✅ Correct!";
-                score++;
-                streak++;
-            } else {
-                result.textContent = `❌ It was ${correctTrack.artistName}`;
-                streak = 0;
+        const options = [correctTrack.artistName];
+
+        while (options.length < 4) {
+            const randomArtist = ARTISTS[Math.floor(Math.random() * ARTISTS.length)];
+            if (!options.includes(randomArtist)) {
+                options.push(randomArtist);
             }
+        }
 
-            questionNumber++;
+        options.sort(() => 0.5 - Math.random());
 
-            setTimeout(loadQuestion, 1500);
-        };
+        options.forEach(name => {
+            const btn = document.createElement("button");
+            btn.textContent = name;
 
-        answersDiv.appendChild(btn);
-    });
+            btn.onclick = () => {
+                Array.from(answersDiv.children).forEach(b => b.disabled = true);
+
+                if (name === correctTrack.artistName) {
+                    result.textContent = "✅ Correct!";
+                    score++;
+                    streak++;
+                } else {
+                    result.textContent = `❌ It was ${correctTrack.artistName}`;
+                    streak = 0;
+                }
+
+                questionNumber++;
+                setTimeout(loadQuestion, 1500);
+            };
+
+            answersDiv.appendChild(btn);
+        });
+    } catch (err) {
+        result.textContent = "⚠️ Error loading songs. Retrying...";
+        setTimeout(loadQuestion, 1000);
+    }
 }
 
 loadQuestion();
