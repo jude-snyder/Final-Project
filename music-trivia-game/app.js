@@ -7,12 +7,12 @@ const streakText = document.getElementById("streak");
 const restartBtn = document.getElementById("restart");
 
 const GENRES = [
-    "top hits",
-    "billboard hot 100",
-    "pop hits",
-    "2000s hits",
-    "2010s hits",
-    "throwback songs"
+  "billboard hot 100",
+  "top 40 hits",
+  "today's hits",
+  "pop radio hits",
+  "best pop songs",
+  "viral hits"
 ];
 
 let usedTrackIds = new Set();
@@ -52,7 +52,7 @@ async function loadQuestion() {
     const randomOffset = Math.floor(Math.random() * 100);
 
     const res = await fetch(
-        'https://itunes.apple.com/search?term=${encodeURIComponent(genre)}&entity=song&limit=50&offset=${randomOffset}'
+        `https://itunes.apple.com/search?term=${encodeURIComponent(genre)}&entity=song&limit=50&offset=${randomOffset}`
     );
 
     const data = await res.json();
@@ -64,9 +64,11 @@ async function loadQuestion() {
         t.trackName &&
         t.previewUrl &&
         t.trackExplicitness === "notExplicit" &&
+        t.primaryGenreName !== "Podcast" &&
         t.artistName.length < 30 &&
         t.trackName.length < 50 &&
-        !usedTrackIds.has(t.trackId)
+        !usedTrackIds.has(t.trackId) &&
+        !usedArtistsGlobal.has(t.artistName)
     );
 
     tracks.sort(() => 0.5 - Math.random());
