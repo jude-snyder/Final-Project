@@ -40,7 +40,13 @@ const ARTISTS = [
   "HUNTR/X",
   "Avicii",
   "Weezer",
-  "Bastille"
+  "Bastille",
+  "Michael Jackson",
+  "Myles Smith",
+  "Panic! At The Disco",
+  "U2",
+  "Usher",
+  "Ava Max",
 ];
 
 let questionNumber = 0
