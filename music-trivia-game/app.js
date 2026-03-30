@@ -50,7 +50,7 @@ const ARTISTS = [
 ];
 
 let questionNumber = 0
-const totalQuestions = 10;
+const totalQuestions = 20;
 let usedArtists = new Set();
 
 let score = 0;
@@ -77,7 +77,7 @@ async function loadQuestion() {
     result.textContent = "";
     answersDiv.innerHTML = "";
 
-    progress.textContent = `Question ${questionNumber + 1} / ${totalQuestions}`;
+    progress.textContent = `Question ${questionNumber + 1} of ${totalQuestions}`;
     scoreText.textContent = `Score: ${score}`;
     streakText.textContent = `🔥 Streak: ${streak}`;
 
@@ -117,9 +117,17 @@ async function loadQuestion() {
         const correctTrack = tracks[Math.floor(Math.random() * tracks.length)];
 
         player.src = correctTrack.previewUrl;
-        player.play().catch(() => {
-            result.textContent = "▶️ Click play to hear the song";
-        });
+        player.currentTime = 0;
+        result.textContent = "▶️ Press play to hear the clip";
+
+        player.onplay = null;
+
+        player.onplay = () => {
+            setTimeout(() => {
+                player.pause();
+                player.currentTime = 0;
+            }, 5000);
+        };
 
         const options = [correctTrack.artistName];
 
@@ -148,7 +156,11 @@ async function loadQuestion() {
                     streak = 0;
                 }
 
+                scoreText.textContent = `Score: ${score}`;
+                streakText.textContent = `🔥 Streak: ${streak}`;
+
                 questionNumber++;
+                
                 setTimeout(loadQuestion, 1500);
             };
 
