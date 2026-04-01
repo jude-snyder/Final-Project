@@ -1,4 +1,5 @@
 const player = document.getElementById("player");
+const endSound = document.getElementById("endSound");
 const answersDiv = document.getElementById("answers");
 const result = document.getElementById("result");
 const progress = document.getElementById("progress");
@@ -6,7 +7,6 @@ const scoreText = document.getElementById("score");
 const streakText = document.getElementById("streak");
 const restartBtn = document.getElementById("restart");
 
-// 🎯 POPULAR ARTISTS (radio-style)
 const ARTISTS = [
   "Taylor Swift",
   "Drake",
@@ -55,22 +55,84 @@ let usedArtists = new Set();
 
 let score = 0;
 let streak = 0;
+let history = [];
 
 function resetGame() {
     usedArtists.clear();
     questionNumber = 0;
     score = 0;
     streak = 0;
-    loadQuestion();
+    history = [];
+
+    document.getElementById("resultsTable").innerHTML = "";
+
+    player.muted = true;
+    player.play().then(() => {
+        player.pause();
+        player.muted = false;
+        loadQuestion();
+    });
 }
 
 restartBtn.onclick = resetGame;
 
+function playEndSong() {
+    endSound.src = "'/Users/snyderkids/Music/Music/Media.localized/Music/Unknown Artist/Unknown Album/the_mountain-lofi-lofi-music-496553.mp3'"
+    endSound.currentTime = 0;
+
+    endSound.play().catch(() => {
+        console.log("Autoplay blocked");
+    });
+}
+
+function showResultsTable() {
+    const tableDiv = document.getElementById("resultsTable");
+
+    let html = `
+    <h2>📊 Results</h2>
+    <table border="1" style="margin:auto; border-collapse:collapse;">
+    <tr>
+    <th>#</th>
+    <th>Song</th>
+    <th>Artist</th>
+    <th>Your Answer</th>
+    <th>Correct Answer</th>
+    <th>Result</th>
+    </tr>
+    
+    `;
+
+    history.forEach((q, index) => {
+        const correct = q.userAnswer === q.correctAnswer;
+
+        html += `
+        <tr style="background:${correct ? "#d4edda" : "#f8d7da"}; ">
+        <td>${index + 1}</td>
+        <td>${q.track}</td>
+        <td>${q.artist}</td>
+        <td>${q.userAnswer}</td>
+        <td>${q.correctAnswer}</td>
+        <td>${correct ? "✅" : "❌"}</td>
+        </tr>
+        `;
+    });
+
+    html += "</table>";
+    tableDiv.innerHTML = html;
+}
+
 async function loadQuestion() {
     if (questionNumber >= totalQuestions) {
+        player.pause();
+        player.currentTime = 0;
+
         progress.textContent = "🎉 Quiz Complete!";
         result.textContent = `Final Score: ${score} / ${totalQuestions}`;
         answersDiv.innerHTML = "";
+
+        showResultsTable();
+        playEndSong();
+
         return;
     }
 
@@ -118,16 +180,14 @@ async function loadQuestion() {
 
         player.src = correctTrack.previewUrl;
         player.currentTime = 0;
-        result.textContent = "▶️ Press play to hear the clip";
 
-        player.onplay = null;
-
-        player.onplay = () => {
-            setTimeout(() => {
-                player.pause();
-                player.currentTime = 0;
-            }, 5000);
-        };
+        try {
+            await player.play();
+            result.textContent = "🎵 Playing preview...";
+        } catch (err) {
+            result.textContent = "▶️ Press play to hear the clip";
+        }
+       
 
         const options = [correctTrack.artistName];
 
@@ -146,6 +206,13 @@ async function loadQuestion() {
 
             btn.onclick = () => {
                 Array.from(answersDiv.children).forEach(b => b.disabled = true);
+
+                history.push({
+                    track:correctTrack.trackName,
+                    artist: correctTrack.artistName,
+                    userAnswer: name,
+                    correctAnswer: correctTrack.artistName
+                });
 
                 if (name === correctTrack.artistName) {
                     result.textContent = "✅ Correct!";
