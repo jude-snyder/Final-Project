@@ -1,11 +1,20 @@
-const player = document.getElementById("player") as HTMLAudioElement;
-const endSound = document.getElementById("endSound") as HTMLAudioElement;
-const answersDiv = document.getElementById("answers");
-const result = document.getElementById("result");
-const progress = document.getElementById("progress");
-const scoreText = document.getElementById("score");
-const streakText = document.getElementById("streak");
-const restartBtn = document.getElementById("restart");
+function getEl<T extends HTMLElement>(id: string): T {
+    const el = document.getElementById(id);
+    if (!el) {
+        throw new Error(`Element with id "${id}" not found`);
+    }
+    return el as T;
+}
+
+const player = getEl<HTMLAudioElement>("player");
+const endSound = getEl<HTMLAudioElement>("endSound");
+const answersDiv = getEl<HTMLDivElement>("answers");
+const result = getEl<HTMLParagraphElement>("result");
+const progress = getEl<HTMLParagraphElement>("progress");
+const scoreText = getEl<HTMLParagraphElement>("score");
+const streakText = getEl<HTMLParagraphElement>("streak");
+const restartBtn = getEl<HTMLButtonElement>("restart");
+const resultsTable = getEl<HTMLDivElement>("resultsTable");
 
 const ARTISTS = [
   "Taylor Swift",
@@ -54,16 +63,19 @@ const ARTISTS = [
 //The amount of questions in the quiz (needs editing)
 let questionNumber = 0
 const totalQuestions = 20
-let usedArtists = new Set();
+let usedArtists = new Set<string>();
 
 let score = 0;
 let streak = 0;
+
 let history: {
     track: string;
     artist: string;
     userAnswer: string;
     correctAnswer: string;
 }[] = [];
+
+restartBtn.onclick = resetGame;
 
 //Reset function
 function resetGame() {
@@ -73,20 +85,16 @@ function resetGame() {
     streak = 0;
     history = [];
 
-    const table = document.getElementById("resultsTable")
-    if (!table) return;
-    
-    table.innerHTML = "";
+    resultsTable.innerHTML = "";
 
-    player.muted = true;
-    player.play().then(() => {
-        player.pause();
-        player.muted = false;
-        loadQuestion();
-    });
-}
+    endSound.pause();
+    endSound.currentTime = 0;
 
-restartBtn!.onclick = resetGame;
+    player.pause();
+    player.currentTime = 0;
+
+     loadQuestion();
+
 
 //The end-screen song that I still need to get working
 function playEndSong() {
