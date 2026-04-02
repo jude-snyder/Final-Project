@@ -47,6 +47,7 @@ const ARTISTS = [
   "U2",
   "Usher",
   "Ava Max",
+  "Daft Punk",
 ];
 
 //The amount of questions in the quiz
