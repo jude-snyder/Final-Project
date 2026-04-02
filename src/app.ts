@@ -1,5 +1,5 @@
-const player = document.getElementById("player");
-const endSound = document.getElementById("endSound");
+const player = document.getElementById("player") as HTMLAudioElement;
+const endSound = document.getElementById("endSound") as HTMLAudioElement;
 const answersDiv = document.getElementById("answers");
 const result = document.getElementById("result");
 const progress = document.getElementById("progress");
@@ -48,16 +48,22 @@ const ARTISTS = [
   "Usher",
   "Ava Max",
   "Daft Punk",
+  "Snoop Dogg",
 ];
 
-//The amount of questions in the quiz
+//The amount of questions in the quiz (needs editing)
 let questionNumber = 0
 const totalQuestions = 20
 let usedArtists = new Set();
 
 let score = 0;
 let streak = 0;
-let history = [];
+let history: {
+    track: string;
+    artist: string;
+    userAnswer: string;
+    correctAnswer: string;
+}[] = [];
 
 //Reset function
 function resetGame() {
@@ -67,7 +73,10 @@ function resetGame() {
     streak = 0;
     history = [];
 
-    document.getElementById("resultsTable").innerHTML = "";
+    const table = document.getElementById("resultsTable")
+    if (!table) return;
+    
+    table.innerHTML = "";
 
     player.muted = true;
     player.play().then(() => {
@@ -77,9 +86,9 @@ function resetGame() {
     });
 }
 
-restartBtn.onclick = resetGame;
+restartBtn!.onclick = resetGame;
 
-//The end-screen song that I still need to get to work
+//The end-screen song that I still need to get working
 function playEndSong() {
     endSound.src = "'/Users/snyderkids/Music/Music/Media.localized/Music/Unknown Artist/Unknown Album/the_mountain-lofi-lofi-music-496553.mp3'"
     endSound.currentTime = 0;
