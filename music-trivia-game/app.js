@@ -52,7 +52,7 @@ const ARTISTS = [
 
 //The amount of questions in the quiz
 let questionNumber = 0
-const totalQuestions = 20;
+const totalQuestions = 20
 let usedArtists = new Set();
 
 let score = 0;
