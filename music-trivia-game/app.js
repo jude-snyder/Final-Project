@@ -49,6 +49,7 @@ const ARTISTS = [
   "Ava Max",
 ];
 
+//The amount of questions in the quiz
 let questionNumber = 0
 const totalQuestions = 20;
 let usedArtists = new Set();
@@ -57,6 +58,7 @@ let score = 0;
 let streak = 0;
 let history = [];
 
+//Reset function
 function resetGame() {
     usedArtists.clear();
     questionNumber = 0;
@@ -76,6 +78,7 @@ function resetGame() {
 
 restartBtn.onclick = resetGame;
 
+//The end-screen song that I still need to get to work
 function playEndSong() {
     endSound.src = "'/Users/snyderkids/Music/Music/Media.localized/Music/Unknown Artist/Unknown Album/the_mountain-lofi-lofi-music-496553.mp3'"
     endSound.currentTime = 0;
@@ -85,6 +88,7 @@ function playEndSong() {
     });
 }
 
+//Results table
 function showResultsTable() {
     const tableDiv = document.getElementById("resultsTable");
 
@@ -102,6 +106,7 @@ function showResultsTable() {
     
     `;
 
+    //Saves your answers for the time being
     history.forEach((q, index) => {
         const correct = q.userAnswer === q.correctAnswer;
 
@@ -121,6 +126,7 @@ function showResultsTable() {
     tableDiv.innerHTML = html;
 }
 
+// A quick summary of the whole quiz
 async function loadQuestion() {
     if (questionNumber >= totalQuestions) {
         player.pause();
@@ -150,6 +156,7 @@ async function loadQuestion() {
 
     usedArtists.add(artist);
 
+    //Fetches the songs
     try {
         const res = await fetch(
             `https://itunes.apple.com/search?term=${encodeURIComponent(artist)}&entity=song&limit=25`
@@ -163,6 +170,7 @@ async function loadQuestion() {
             return;
         }
 
+        // Filter for the songs
         let tracks = data.results.filter(t =>
             t.previewUrl &&
             t.artistName &&
@@ -176,6 +184,7 @@ async function loadQuestion() {
             return;
         }
 
+        // Shuffles the tracks
         const correctTrack = tracks[Math.floor(Math.random() * tracks.length)];
 
         player.src = correctTrack.previewUrl;
