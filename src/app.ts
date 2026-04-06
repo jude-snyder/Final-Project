@@ -60,6 +60,25 @@ const ARTISTS = [
   "Snoop Dogg",
 ];
 
+function getRandomItem<T>(items: T[]): T {
+    if (items.length === 0) {
+        throw new Error("No items available to select.");
+    }
+    const index = Math.floor(Math.random() * items.length);
+    return items[index]!;
+}
+
+function getRandomArtist(): string {
+    return getRandomItem(ARTISTS);
+}
+
+type Track = {
+    previewUrl: string;
+    artistName: string;
+    trackName: string;
+    trackExplicitness: string;
+}
+
 //The amount of questions in the quiz (needs editing)
 let questionNumber = 0
 const totalQuestions = 20
@@ -93,12 +112,12 @@ function resetGame() {
     player.pause();
     player.currentTime = 0;
 
-     loadQuestion();
-
+    loadQuestion();
+}
 
 //The end-screen song that I still need to get working
 function playEndSong() {
-    endSound.src = "'/Users/snyderkids/Music/Music/Media.localized/Music/Unknown Artist/Unknown Album/the_mountain-lofi-lofi-music-496553.mp3'"
+    endSound.src = "/Users/snyderkids/Music/Music/Media.localized/Music/Unknown Artist/Unknown Album/the_mountain-lofi-lofi-music-496553.mp3";
     endSound.currentTime = 0;
 
     endSound.play().catch(() => {
@@ -108,8 +127,6 @@ function playEndSong() {
 
 //Results table
 function showResultsTable() {
-    const tableDiv = document.getElementById("resultsTable");
-
     let html = `
     <h2>📊 Results</h2>
     <table border="1" style="margin:auto; border-collapse:collapse;">
@@ -121,7 +138,6 @@ function showResultsTable() {
     <th>Correct Answer</th>
     <th>Result</th>
     </tr>
-    
     `;
 
     //Saves your answers for the time being
@@ -141,7 +157,7 @@ function showResultsTable() {
     });
 
     html += "</table>";
-    tableDiv.innerHTML = html;
+    resultsTable.innerHTML = html;
 }
 
 // A quick summary of the whole quiz
@@ -156,7 +172,6 @@ async function loadQuestion() {
 
         showResultsTable();
         playEndSong();
-
         return;
     }
 
@@ -167,9 +182,9 @@ async function loadQuestion() {
     scoreText.textContent = `Score: ${score}`;
     streakText.textContent = `🔥 Streak: ${streak}`;
 
-    let artist;
+    let artist: string;
     do {
-        artist = ARTISTS[Math.floor(Math.random() * ARTISTS.length)];
+        artist = getRandomArtist();
     } while (usedArtists.has(artist));
 
     usedArtists.add(artist);
@@ -189,7 +204,7 @@ async function loadQuestion() {
         }
 
         // Filter for the songs
-        let tracks = data.results.filter(t =>
+        let tracks = (data.results as Track[]).filter(t =>
             t.previewUrl &&
             t.artistName &&
             t.trackName &&
@@ -203,7 +218,7 @@ async function loadQuestion() {
         }
 
         // Shuffles the tracks
-        const correctTrack = tracks[Math.floor(Math.random() * tracks.length)];
+        const correctTrack = getRandomItem(tracks);
 
         player.src = correctTrack.previewUrl;
         player.currentTime = 0;
@@ -211,28 +226,30 @@ async function loadQuestion() {
         try {
             await player.play();
             result.textContent = "🎵 Playing preview...";
-        } catch (err) {
+        } catch {
             result.textContent = "▶️ Press play to hear the clip";
         }
        
 
-        const options = [correctTrack.artistName];
+        const options: string[] = [correctTrack.artistName];
 
         while (options.length < 4) {
-            const randomArtist = ARTISTS[Math.floor(Math.random() * ARTISTS.length)];
+            const randomArtist = getRandomArtist();
             if (!options.includes(randomArtist)) {
                 options.push(randomArtist);
             }
         }
 
-        options.sort(() => 0.5 - Math.random());
+        options.sort(() => Math.random() - 0.5);
 
         options.forEach(name => {
             const btn = document.createElement("button");
             btn.textContent = name;
 
             btn.onclick = () => {
-                Array.from(answersDiv.children).forEach(b => b.disabled = true);
+                Array.from(answersDiv.children).forEach(b => {
+                    (b as HTMLButtonElement).disabled = true;
+                });
 
                 history.push({
                     track:correctTrack.trackName,
@@ -260,10 +277,13 @@ async function loadQuestion() {
 
             answersDiv.appendChild(btn);
         });
-    } catch (err) {
+    } catch {
         result.textContent = "⚠️ Error loading songs. Retrying...";
         setTimeout(loadQuestion, 1000);
     }
 }
 
-loadQuestion();
+window.onload = () => {
+    loadQuestion();
+};
+
