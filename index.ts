@@ -2,7 +2,7 @@ import path from "node:path";
 
 const index = Bun.file(path.join(process.cwd(), "./src/index.html"));
 const styles = Bun.file(path.join(process.cwd(), "./src/styles.css"));
-const endSound = Bun.file(path.join(process.cwd(), "./src/end.mp3"));
+const applause = Bun.file(path.join(process.cwd(), "./src/applause.mp3"));
 
 const result = await Bun.build({
     entrypoints: ["./src/app.ts"],
@@ -21,7 +21,7 @@ const server = Bun.serve({
                 "Content-Type": "application/javascript",
             },
         }),
-        "/end.mp3": endSound,
+        "/applause.mp3": applause,
     },
 });
 

@@ -117,12 +117,24 @@ function resetGame() {
 
 //The end-screen song that I still need to get working
 function playEndSong() {
-    endSound.src = "/Users/snyderkids/Music/Music/Media.localized/Music/Unknown Artist/Unknown Album/the_mountain-lofi-lofi-music-496553.mp3";
+    endSound.src = "/applause.mp3";
     endSound.currentTime = 0;
+    endSound.muted = false;
 
-    endSound.play().catch(() => {
-        console.log("Autoplay blocked");
+    const playPromise = endSound.play();
+
+    if (playPromise !== undefined) {
+        playPromise
+        .then(() => {
+            console.log("End song is playing.");
+    })
+    .catch((error) => {
+        console.log("Autoplay blocked or error:", error);
+        // Show controls so the user can manually play the song
+        endSound.controls = true;
     });
+
+}
 }
 
 //Results table
