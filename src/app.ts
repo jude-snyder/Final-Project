@@ -115,7 +115,7 @@ function resetGame() {
     loadQuestion();
 }
 
-//The end-screen song that I still need to get working
+//The end-screen sound effect, with a fallback for autoplay restrictions
 function playEndSong() {
     endSound.src = "/applause.mp3";
     endSound.currentTime = 0;
