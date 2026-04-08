@@ -14,3 +14,31 @@ button {
 #restart {
     margin-top: 20px;
 }
+
+#resultsTable table {
+    width: min(100%, 900px);
+    margin: 20px auto;
+    border-collapse: collapse;
+}
+
+#resultsTable th,
+#resultsTable td {
+    padding: 10px 12px;
+    border: 1px solid #333;
+    text-align: left;
+}
+
+#resultsTable th {
+    background: #f0f0f0;
+}
+
+#resultsTable td {
+    white-space: nowrap;
+}
+
+body {
+    margin: 0;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    text-align: center;
+}
