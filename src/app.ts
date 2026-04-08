@@ -180,6 +180,10 @@ async function loadQuestion() {
 
     // Pick an unused artist
     let artist: string;
+    if (usedArtists.size >= ARTISTS.length) {
+        usedArtists.clear(); // Reset if we've used all artists
+    }
+    
     do {
         artist = getRandomArtist();
     } while (usedArtists.has(artist));
