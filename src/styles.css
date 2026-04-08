@@ -16,8 +16,8 @@ button {
 }
 
 #resultsTable table {
-    width: min(100%, 900px);
-    margin: 20px auto;
+    width: 100%;
+    margin: 0;
     border-collapse: collapse;
 }
 
@@ -29,11 +29,11 @@ button {
 }
 
 #resultsTable th {
-    background: #f0f0f0;
+    background: #727876;
 }
 
 #resultsTable td {
-    white-space: nowrap;
+    white-space: normal;
 }
 
 body {
@@ -41,4 +41,7 @@ body {
     padding: 20px;
     font-family: Arial, sans-serif;
     text-align: center;
+
+    background-color: #1e1e2f;
+    color: white
 }
