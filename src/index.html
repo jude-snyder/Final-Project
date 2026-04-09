@@ -1,36 +1,39 @@
-<div id="modeSelect">
-    <h2 Select Mode</h2>
-        <button id="relaxBtn">😌 Relax Mode</button>
-        <button id="stressBtn">😰 Stressful Mode (5 min)</button>
-</div>
-
-<p id="timer" style="display:none;"></p>
-
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Music Trivia</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
 
-<h1>🎵 Guess the Artist</h1>
+    <div id="modeSelect">
+        <h2> Select Mode</h2>
+        <button id="relaxBtn">😌 Relax Mode</button>
+        <button id="stressBtn">😰 Stressful Mode (5 min)</button>
+    </div>
 
-<p id="progress"></p>
-<p id="score"></p>
-<p id="streak"></p>
+    <p id="timer" style="display:none;"></p>
 
-<audio id="player"></audio>
-<audio id="endSound" controls></audio>
+    <h1>🎵 Guess the Artist</h1>
 
-<div id="answers"></div>
-<div id="resultsTable"></div>
+    <p id="progress"></p>
+    <p id="score"></p>
+    <p id="streak"></p>
 
-<p id="result"></p>
+    <audio id="player"></audio>
+    <audio id="endSound" controls></audio>
 
-<button id="restart">Restart Quiz</button>
+    <div id="answers"></div>
+    <div id="resultsTable"></div>
 
-<script type="module" src="app.js"></script>
+    <p id="result"></p>
+
+    <button id="restart">Restart Quiz</button>
+
+    <script type="module" src="app.js"></script>
 
 </body>
+
 </html>
