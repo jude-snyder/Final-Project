@@ -29,6 +29,7 @@ const setupTitle = getEl<HTMLHeadingElement>("setupTitle");
 const questionOptions = getEl<HTMLDivElement>("questionOptions");
 const startBtn = getEl<HTMLButtonElement>("startBtn");
 const qButtons = document.querySelectorAll<HTMLButtonElement>(".qBtn");
+const loadingOverlay = getEl<HTMLDivElement>("loadingOverlay");
 
 // Hide audio controls from user
 player.style.display = 'none';
@@ -206,6 +207,9 @@ function startTimer() {
 
 // Main game loop
 async function loadQuestion() {
+    loadingOverlay.style.display = "flex";
+    answersDiv.style.opacity = "0";
+    await new Promise(res=>setTimeout(res, 300));
     if (mode === "relax" && questionNumber >= totalQuestions) {
       player.pause();
       player.currentTime = 0;
@@ -215,6 +219,7 @@ async function loadQuestion() {
         showResultsTable();
         playEndSong();
         confetti();
+        loadingOverlay.style.display = "none";
         return;
     }
 
@@ -315,6 +320,10 @@ async function loadQuestion() {
 
             answersDiv.appendChild(btn);
         });
+
+        await new Promise(res => setTimeout(res,50));
+        answersDiv.style.opacity = "1";
+         loadingOverlay.style.display = "none";
     } catch {
         result.textContent = "⚠️ Error loading songs. Retrying...";
         setTimeout(loadQuestion, 1000);
