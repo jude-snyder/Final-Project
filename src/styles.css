@@ -49,7 +49,7 @@ body {
 }
 
 body {
-    transition: background-color 0.5s ease;
+    transition: background-color 2.0s ease;
 }
 
 body.relax-mode {
@@ -58,4 +58,9 @@ body.relax-mode {
 
 body.stress-mode {
     background-color: #c20000;
+}
+
+.qBtn.selected {
+    background-color: rgb(1, 84, 8);
+    color: white;
 }

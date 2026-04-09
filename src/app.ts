@@ -24,6 +24,11 @@ const modeSelect = getEl<HTMLDivElement>("modeSelect");
 const timerText = getEl<HTMLParagraphElement>("timer");
 const relaxBtn = getEl<HTMLButtonElement>("relaxBtn");
 const stressBtn = getEl<HTMLButtonElement>("stressBtn");
+const setupScreen = getEl<HTMLDivElement>("setupScreen");
+const setupTitle = getEl<HTMLHeadingElement>("setupTitle");
+const questionOptions = getEl<HTMLDivElement>("questionOptions");
+const startBtn = getEl<HTMLButtonElement>("startBtn");
+const qButtons = document.querySelectorAll<HTMLButtonElement>(".qBtn");
 
 // Hide audio controls from user
 player.style.display = 'none';
@@ -114,18 +119,49 @@ let history: {
 
 restartBtn.onclick = resetGame;
 
-relaxBtn.onclick = () => startGame("relax");
-stressBtn.onclick = () => startGame("stress");
+relaxBtn.onclick = () => selectMode("relax");
+stressBtn.onclick = () => selectMode("stress");
 
-// Start game with selected mode
-function startGame(selected: "relax" | "stress") {
+function selectMode(selected: "relax" | "stress") {
     mode = selected;
+
     modeSelect.style.display = "none";
+    setupScreen.style.display = "block";
 
     document.body.classList.remove("relax-mode", "stress-mode");
     document.body.classList.add(
         selected === "relax" ? "relax-mode" : "stress-mode"
     );
+
+    if (selected === "relax") {
+        setupTitle.textContent = "😌 Relax Mode";
+        questionOptions.style.display = "block";
+        startBtn.disabled = true;
+    } else {
+        setupTitle.textContent = "😰 Stress Mode (5 min)";
+        questionOptions.style.display = "none";
+        startBtn.disabled = false;
+    }
+
+    qButtons.forEach(btn => {
+        btn.onclick = () => {
+            totalQuestions = Number(btn.dataset.q);
+
+            qButtons.forEach(b => b.classList.remove("selected"));
+            btn.classList.add("selected");
+            
+            startBtn.disabled = false;
+        };
+    });
+
+    startBtn.onclick = () => startGame();
+};
+
+
+
+// Start game with selected mode
+function startGame() {
+    setupScreen.style.display = "none";
 
     if (mode === "stress") {
         startTimer();
@@ -134,13 +170,19 @@ function startGame(selected: "relax" | "stress") {
     loadQuestion();
 }
 
+function formatTime(seconds: number): string {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+}
+
 function startTimer() {
     timeLeft = 300;
     timerText.style.display = "block";
 
     timerInterval = setInterval(() => {
         timeLeft--;
-        timerText.textContent = `⏱️ ${timeLeft}s`;
+        timerText.textContent = `⏱️ ${formatTime(timeLeft)}`;
 
         if (timerInterval !== null && timeLeft <= 0) {
             clearInterval(timerInterval);
