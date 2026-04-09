@@ -41,7 +41,21 @@ body {
     padding: 20px;
     font-family: Arial, sans-serif;
     text-align: center;
-
-    background-color: #fcff43;
     color: black;
+}
+
+body {
+    background-color: #fcff43;
+}
+
+body {
+    transition: background-color 0.5s ease;
+}
+
+body.relax-mode {
+    background-color: #91f5a0;
+}
+
+body.stress-mode {
+    background-color: #c20000;
 }

@@ -122,6 +122,11 @@ function startGame(selected: "relax" | "stress") {
     mode = selected;
     modeSelect.style.display = "none";
 
+    document.body.classList.remove("relax-mode", "stress-mode");
+    document.body.classList.add(
+        selected === "relax" ? "relax-mode" : "stress-mode"
+    );
+
     if (mode === "stress") {
         startTimer();
     }
@@ -274,6 +279,7 @@ async function loadQuestion() {
 
     // Reset game state and reload page
     function resetGame() {
+        document.body.classList.remove("relax-mode", "stress-mode");
         location.reload();
     }
 
