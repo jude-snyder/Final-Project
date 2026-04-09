@@ -190,6 +190,7 @@ async function loadQuestion() {
 
     usedArtists.add(artist);
 
+    // Fetch songs for the artist from iTunes API
     try {
         const res = await fetch(
         `https://itunes.apple.com/search?term=${encodeURIComponent(artist)}&entity=song&limit=50`
@@ -209,6 +210,7 @@ async function loadQuestion() {
         player.src = correctTrack.previewUrl;
         player.currentTime = 0;
 
+        // Try to play the preview (some browsers require user interaction first)
         try {
             await player.play();
             result.textContent = "🎵 Playing preview...";
@@ -227,6 +229,7 @@ async function loadQuestion() {
 
         options.sort(() => Math.random() - 0.5);
 
+        // Create answer buttons
         options.forEach(name => {
             const btn = document.createElement("button");
             btn.textContent = name;
@@ -235,6 +238,7 @@ async function loadQuestion() {
                     (b as HTMLButtonElement).disabled = true;
                 });
 
+                // Save to history for results table
                 history.push({
                     track: correctTrack.trackName,
                     artist: correctTrack.artistName,
@@ -242,6 +246,7 @@ async function loadQuestion() {
                     correctAnswer: correctTrack.artistName
                 });
 
+                // Check answer and update score/streak
                 if (name === correctTrack.artistName) {
                     score++;
                     streak++;
@@ -267,10 +272,12 @@ async function loadQuestion() {
     }
 }
 
+    // Reset game state and reload page
     function resetGame() {
         location.reload();
     }
 
+    // Play applause sound at the end of the game
     function playEndSong() {
         endSound.src = "/applause.mp3";
         endSound.currentTime = 0;
@@ -279,6 +286,7 @@ async function loadQuestion() {
         endSound.play().catch(() => {});
     }
 
+    // Generate results table HTML and display it
     function showResultsTable() {
         let html = `
           <h2>📊 Results</h2>
@@ -295,6 +303,7 @@ async function loadQuestion() {
             history.forEach((q, index) => {
                 const isCorrect = q.userAnswer === q.correctAnswer;
 
+                // Use green for correct and red for wrong answers
                 html += `
                 <tr style="background: ${isCorrect ? "d4edda" : "f8d7da"};">
                     <td>${index + 1}</td>
@@ -310,4 +319,5 @@ async function loadQuestion() {
             resultsTable.innerHTML = html;
     }
 
+    // Start with mode selection screen
     window.onload = () => {};
