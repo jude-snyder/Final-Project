@@ -104,6 +104,7 @@ let totalQuestions = 20
 let usedArtists = new Set<string>();
 let score = 0;
 let streak = 0;
+let highestStreak = 0;
 
 let mode: "relax" | "stress" | null = null;
 let timeLeft = 300; // 5 minutes in seconds
@@ -297,6 +298,7 @@ async function loadQuestion() {
                 if (name === correctTrack.artistName) {
                     score++;
                     streak++;
+                    if (streak > highestStreak) highestStreak = streak;
                     result.textContent = "✅ Correct!";
                 } else {
                     streak = 0;
@@ -338,6 +340,7 @@ async function loadQuestion() {
     function showResultsTable() {
         let html = `
           <h2>📊 Results</h2>
+          <p>🔥 Highest Streak: ${highestStreak}</p>
         <table border="1" style="margin:auto; border-collapse: collapse;">
             <tr>
             <th>#</th>
