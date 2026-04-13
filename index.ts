@@ -15,7 +15,12 @@ const script = await result.outputs[0]!.text();
 const server = Bun.serve({
     routes: {
         "/": index,
-        "/styles.css": styles,
+        "/styles.css": new Response(await styles.text(), {
+            headers: {
+                "Content-Type": "text/css",
+                "Cache-Control": "no-store",
+            }
+        }),
         "/app.js": new Response(script, {
             headers: {
                 "Content-Type": "application/javascript",
