@@ -5,23 +5,23 @@ body {
     text-align: center;
     color: black;
 
-    background: linear-gradient(-45deg, #fcff43, #ff9a9e, #91f5a0, #a18cd1);
-    background-size: 400% 400%;
-    animation: gradientMove 10s ease infinite;
+    body:not(.relax-mode):not(.stress-mode) & {
+        background: linear-gradient(-45deg, #fcff43, #ff9a9e, #91f5a0, #a18cd1);
+        background-size: 400% 400%;
+        animation: gradientMove 10s ease infinite;
+    }
 
     transition: background-color 2.0s ease;
 }
 
 body.relax-mode {
-    background-color: #69fb7e;
+    background: #69fb7e;
     animation: none;
-    background: none;
 }
 
 body.stress-mode {
-    background-color: #c20000;
+    background: #c20000;
     animation: none;
-    background: none;
 }
 
 #modeSelect button {
