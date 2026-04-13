@@ -55,6 +55,11 @@ button {
     z-index: 999;
     transition: opacity 0.3s ease;
 }
+
+#loadingOverlay.active {
+    pointer-events: all;
+}
+
 body {
     margin: 0;
     padding: 20px;

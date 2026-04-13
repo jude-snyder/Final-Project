@@ -10,8 +10,12 @@ function getEl<T extends HTMLElement>(id: string): T {
 // Import confetti
 import confetti from 'canvas-confetti';
 
+console.log("DOM loaded");
+console.log(document.getElementById("gameContainer"));
+
 // Grabs all DOM elements
-const player = getEl<HTMLAudioElement>("player");
+window.addEventListener("DOMContentLoaded", () => {
+     const player = getEl<HTMLAudioElement>("player");
 const endSound = getEl<HTMLAudioElement>("endSound");
 const answersDiv = getEl<HTMLDivElement>("answers");
 const result = getEl<HTMLParagraphElement>("result");
@@ -30,6 +34,11 @@ const questionOptions = getEl<HTMLDivElement>("questionOptions");
 const startBtn = getEl<HTMLButtonElement>("startBtn");
 const qButtons = document.querySelectorAll<HTMLButtonElement>(".qBtn");
 const loadingOverlay = getEl<HTMLDivElement>("loadingOverlay");
+const gameContainer = document.getElementById("gameContainer")!;
+if (!gameContainer) {
+    console.error("Game container not found");
+    return;
+}
 
 // Hide audio controls from user
 player.style.display = 'none';
@@ -106,6 +115,7 @@ let usedArtists = new Set<string>();
 let score = 0;
 let streak = 0;
 let highestStreak = 0;
+let isGameOver = false;
 
 let mode: "relax" | "stress" | null = null;
 let timeLeft = 300; // 5 minutes in seconds
@@ -195,11 +205,19 @@ function startTimer() {
 }
 
     function endGame() {
+        isGameOver = true;
+       // Stop music and timer
         player.pause();
         player.currentTime = 0;
+        if (timerInterval !== null) {
+            clearInterval(timerInterval);
+        }
+        gameContainer.style.display = "none";
+
         progress.textContent = "⏰ Time's Up!";
         result.textContent = `Score: ${score}`;
         answersDiv.innerHTML = "";
+        loadingOverlay.style.display = "none";
         showResultsTable();
         playEndSong();
         confetti();
@@ -207,6 +225,7 @@ function startTimer() {
 
 // Main game loop
 async function loadQuestion() {
+    if (isGameOver) return;
     loadingOverlay.style.display = "flex";
     answersDiv.style.opacity = "0";
     await new Promise(res=>setTimeout(res, 300));
@@ -287,9 +306,12 @@ async function loadQuestion() {
             const btn = document.createElement("button");
             btn.textContent = name;
             btn.onclick = () => {
+                if (isGameOver) return;
                 Array.from(answersDiv.children).forEach(b => {
                     (b as HTMLButtonElement).disabled = true;
                 });
+
+                if (isGameOver) return;
 
                 // Save to history for results table
                 history.push({
@@ -315,7 +337,9 @@ async function loadQuestion() {
 
                 questionNumber++;
 
-                setTimeout(loadQuestion, 1500);
+                setTimeout(() => {
+                    if (!isGameOver) loadQuestion();
+                }, 1500);
             };
 
             answersDiv.appendChild(btn);
@@ -332,6 +356,7 @@ async function loadQuestion() {
 
     // Reset game state and reload page
     function resetGame() {
+        isGameOver = true;
         document.body.classList.remove("relax-mode", "stress-mode");
         location.reload();
     }
@@ -349,6 +374,7 @@ async function loadQuestion() {
     function showResultsTable() {
         let html = `
           <h2>📊 Results</h2>
+          <p>🏆 Final Score: ${score}${mode === "relax" ? ` / ${totalQuestions}` : ""}</p>
           <p>🔥 Highest Streak: ${highestStreak}</p>
         <table border="1" style="margin:auto; border-collapse: collapse;">
             <tr>
@@ -378,6 +404,4 @@ async function loadQuestion() {
             html += "</table>";
             resultsTable.innerHTML = html;
     }
-
-    // Start with mode selection screen
-    window.onload = () => {};
+});
