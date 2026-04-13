@@ -5,14 +5,14 @@ body {
     text-align: center;
     color: black;
 
-    body:not(.relax-mode):not(.stress-mode) & {
+    transition: background-color 2.0s ease;
+}
+
+    body:not(.relax-mode):not(.stress-mode) {
         background: linear-gradient(-45deg, #fcff43, #ff9a9e, #91f5a0, #a18cd1);
         background-size: 400% 400%;
         animation: gradientMove 10s ease infinite;
     }
-
-    transition: background-color 2.0s ease;
-}
 
 body.relax-mode {
     background: #69fb7e;
