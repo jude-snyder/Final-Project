@@ -315,8 +315,6 @@ async function loadQuestion() {
                
                 buttons.forEach(b => b.disabled = true);
 
-                btn.classList.add("selected-answer");
-
                 const isCorrect = name === correctTrack.artistName;
 
                 // Save to history for results table
@@ -332,20 +330,23 @@ async function loadQuestion() {
                     score++;
                     streak++;
                     if (streak > highestStreak) highestStreak = streak;
-                    btn.classList.add("correct");
                     result.textContent = "✅ Correct!";
                 } else {
                     streak = 0;
-                    btn.classList.add("incorrect");
+
+                    result.textContent = `❌ Wrong! It was ${correctTrack.artistName}`;
+                }
 
                     buttons.forEach(b => {
                         if (b.textContent === correctTrack.artistName) {
                             b.classList.add("correct");
+                            b.classList.add("selected-answer");
+                        } else {
+                            b.classList.add("incorrect");
                         }
                     });
-                   
-                    result.textContent = `❌ Wrong! It was ${correctTrack.artistName}`;
-                }
+                
+                
 
                 scoreText.textContent = `Score: ${score}`;
                 streakText.textContent = `🔥 Streak: ${streak}`;
