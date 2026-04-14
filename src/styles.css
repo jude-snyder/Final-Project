@@ -135,6 +135,13 @@ button.incorrect {
     pointer-events: none;
 }
 
+#backToMenuBtn {
+    background-color: white;
+    width: 200px;
+    font-size: 1em;
+    margin-bottom: 15px;
+}
+
 #restart {
     margin-top: 20px;
 }

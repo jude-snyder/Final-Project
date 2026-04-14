@@ -26,19 +26,27 @@ const stressSfx = new Audio("/stress.mp3");
 const menuMusic = new Audio("/menu.mp3");
 menuMusic.loop = true;
 menuMusic.volume = 0.5;
+menuMusic.preload = "auto";
 
 const answersDiv = getEl<HTMLDivElement>("answers");
 const result = getEl<HTMLParagraphElement>("result");
 const progress = getEl<HTMLParagraphElement>("progress");
 const scoreText = getEl<HTMLParagraphElement>("score");
 const streakText = getEl<HTMLParagraphElement>("streak");
-const restartBtn = getEl<HTMLButtonElement>("restart");
+const restartBtn = getEl<HTMLButtonElement>("restart"); // "Return to Menu" button
 const resultsTable = getEl<HTMLDivElement>("resultsTable");
 const modeSelect = getEl<HTMLDivElement>("modeSelect");
 const timerText = getEl<HTMLParagraphElement>("timer");
 const relaxBtn = getEl<HTMLButtonElement>("relaxBtn");
 const stressBtn = getEl<HTMLButtonElement>("stressBtn");
-const musicBtn = getEl<HTMLButtonElement>("musicBtn");
+const backToMenuBtn = getEl<HTMLButtonElement>("backToMenuBtn");
+let musicBtn: HTMLButtonElement | null = null;
+
+try {
+    musicBtn = getEl<HTMLButtonElement>("musicBtn");
+} catch (error) {
+    console.warn("musicBtn not found in DOM.");
+}
 const setupScreen = getEl<HTMLDivElement>("setupScreen");
 const setupTitle = getEl<HTMLHeadingElement>("setupTitle");
 const questionOptions = getEl<HTMLDivElement>("questionOptions");
@@ -47,8 +55,7 @@ const qButtons = document.querySelectorAll<HTMLButtonElement>(".qBtn");
 const loadingOverlay = getEl<HTMLDivElement>("loadingOverlay");
 const gameContainer = document.getElementById("gameContainer")!;
 if (!gameContainer) {
-    console.error("Game container not found");
-    return;
+    throw new Error("gameContainer missing - app cannot run");
 }
 
 // Hide audio controls from user
@@ -156,23 +163,26 @@ stressBtn.onclick = () => {
     selectMode("stress");
 };
 
-musicBtn.onclick = () => {
-    menuMusic.play().catch(() => {});
-    
-    playSound(clickSfx);
+if (musicBtn) {
+    musicBtn.onclick = () => {
+        menuMusic.play().catch(() => {});
 
-    musicBtn.classList.add("fade-out");
-    
-    setTimeout(() => {
-        musicBtn.style.display = "none";
-    }, 600);
+        playSound(clickSfx);
+
+        musicBtn!.classList.add("fade-out");
+        setTimeout(() => {
+            musicBtn!.style.display = "none";
+        }, 600);
+    };
 }
+ 
 
 function selectMode(selected: "relax" | "stress") {
     mode = selected;
 
     modeSelect.style.display = "none";
     setupScreen.style.display = "block";
+    backToMenuBtn.style.display = "block";
 
     document.body.classList.remove("relax-mode", "stress-mode");
     document.body.classList.add(
@@ -211,6 +221,22 @@ function selectMode(selected: "relax" | "stress") {
     }
 };
 
+backToMenuBtn.onclick = () => {
+    playSound(clickSfx);
+
+    setupScreen.style.display = "none";
+    modeSelect.style.display = "block";
+
+    mode = null;
+
+    qButtons.forEach(btn => btn.classList.remove("selected"));
+    document.body.classList.remove("relax-mode", "stress-mode");
+    document.body.style.background = "";
+    startBtn.disabled = true;
+
+    backToMenuBtn.style.display = "none";
+};
+
 function playSound(sound: HTMLAudioElement) {
     sound.currentTime = 0;
     sound.play().catch(() => {});
@@ -219,6 +245,7 @@ function playSound(sound: HTMLAudioElement) {
 // Start game with selected mode
 function startGame() {
     setupScreen.style.display = "none";
+    restartBtn.style.display = "block";
 
     if (mode === "stress") {
         startTimer();
@@ -260,7 +287,10 @@ function startTimer() {
         gameContainer.style.display = "none";
 
         progress.textContent = "⏰ Time's Up!";
-        result.textContent = `Score: ${score}`;
+        answersDiv.innerHTML = "";
+        scoreText.textContent = "";
+        streakText.textContent = "";
+        result.textContent = ""
         answersDiv.innerHTML = "";
         loadingOverlay.style.display = "none";
         showResultsTable();
@@ -278,8 +308,10 @@ async function loadQuestion() {
       player.pause();
       player.currentTime = 0;
         progress.textContent = "🎉 Quiz Complete!";
-        result.textContent = `Final Score: ${score}/${totalQuestions}`;
         answersDiv.innerHTML = "";
+        scoreText.textContent = "";
+        streakText.textContent = "";
+        result.textContent = ""
         showResultsTable();
         playEndSong();
         confetti();
@@ -394,9 +426,10 @@ async function loadQuestion() {
                     });
                 
                 
-
+                if (!isGameOver) {
                 scoreText.textContent = `Score: ${score}`;
                 streakText.textContent = `🔥 Streak: ${streak}`;
+                }
 
                 questionNumber++;
 
@@ -421,7 +454,9 @@ async function loadQuestion() {
     // Reset game state and reload page
     function resetGame() {
         isGameOver = true;
+        restartBtn.style.display = "none";
         document.body.classList.remove("relax-mode", "stress-mode");
+        document.body.style.background = "";
         location.reload();
     }
 
@@ -433,6 +468,11 @@ async function loadQuestion() {
 
         endSound.play().catch(() => {});
     }
+
+    progress.textContent = "";
+    scoreText.textContent = "";
+    streakText.textContent = "";
+    result.textContent = "";
 
     // Generate results table HTML and display it
     function showResultsTable() {
