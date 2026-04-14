@@ -27,12 +27,6 @@ const menuMusic = new Audio("/menu.mp3");
 menuMusic.loop = true;
 menuMusic.volume = 0.5;
 
-document.body.addEventListener("click", () => {
-    if (menuMusic.paused) {
-        menuMusic.play().catch(() => {});
-    }
-}, { once: true });
-
 const answersDiv = getEl<HTMLDivElement>("answers");
 const result = getEl<HTMLParagraphElement>("result");
 const progress = getEl<HTMLParagraphElement>("progress");
@@ -44,6 +38,7 @@ const modeSelect = getEl<HTMLDivElement>("modeSelect");
 const timerText = getEl<HTMLParagraphElement>("timer");
 const relaxBtn = getEl<HTMLButtonElement>("relaxBtn");
 const stressBtn = getEl<HTMLButtonElement>("stressBtn");
+const musicBtn = getEl<HTMLButtonElement>("musicBtn");
 const setupScreen = getEl<HTMLDivElement>("setupScreen");
 const setupTitle = getEl<HTMLHeadingElement>("setupTitle");
 const questionOptions = getEl<HTMLDivElement>("questionOptions");
@@ -160,6 +155,18 @@ stressBtn.onclick = () => {
     playSound(stressSfx);
     selectMode("stress");
 };
+
+musicBtn.onclick = () => {
+    menuMusic.play().catch(() => {});
+    
+    playSound(clickSfx);
+
+    musicBtn.classList.add("fade-out");
+    
+    setTimeout(() => {
+        musicBtn.style.display = "none";
+    }, 600);
+}
 
 function selectMode(selected: "relax" | "stress") {
     mode = selected;

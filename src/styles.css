@@ -115,6 +115,26 @@ button.incorrect {
     font-weight: bold;
 }
 
+#musicBtn {
+    background-color: rgba(255, 255, 255, 0.8);
+    width: 160px;
+    font-size: 0.9em;
+    padding: 10px;
+    opacity: 0.85;
+    transition: all 0.4s ease, opacity 0.6s ease;
+}
+
+#musicBtn:hover {
+    transform: scale(1.05);
+    opacity: 1;
+}
+
+#musicBtn.fade-out {
+    opacity: 0;
+    transform: scale(0.9);
+    pointer-events: none;
+}
+
 #restart {
     margin-top: 20px;
 }
