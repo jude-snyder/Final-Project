@@ -301,17 +301,23 @@ async function loadQuestion() {
 
         options.sort(() => Math.random() - 0.5);
 
+        answersDiv.style.opacity = "0";
+
         // Create answer buttons
         options.forEach(name => {
             const btn = document.createElement("button");
             btn.textContent = name;
             btn.onclick = () => {
                 if (isGameOver) return;
-                Array.from(answersDiv.children).forEach(b => {
-                    (b as HTMLButtonElement).disabled = true;
-                });
+                answersDiv.classList.add("answers-locked");
+                
+                const buttons = Array.from(answersDiv.children) as HTMLButtonElement[];
+               
+                buttons.forEach(b => b.disabled = true);
 
-                if (isGameOver) return;
+                btn.classList.add("selected-answer");
+
+                const isCorrect = name === correctTrack.artistName;
 
                 // Save to history for results table
                 history.push({
@@ -326,9 +332,18 @@ async function loadQuestion() {
                     score++;
                     streak++;
                     if (streak > highestStreak) highestStreak = streak;
+                    btn.classList.add("correct");
                     result.textContent = "✅ Correct!";
                 } else {
                     streak = 0;
+                    btn.classList.add("incorrect");
+
+                    buttons.forEach(b => {
+                        if (b.textContent === correctTrack.artistName) {
+                            b.classList.add("correct");
+                        }
+                    });
+                   
                     result.textContent = `❌ Wrong! It was ${correctTrack.artistName}`;
                 }
 
@@ -338,6 +353,7 @@ async function loadQuestion() {
                 questionNumber++;
 
                 setTimeout(() => {
+                    answersDiv.classList.remove("answers-locked");
                     if (!isGameOver) loadQuestion();
                 }, 1500);
             };

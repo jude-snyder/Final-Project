@@ -4,34 +4,42 @@ body {
     font-family: Arial, sans-serif;
     text-align: center;
     color: black;
+    background-color: #fcff43;
 
     transition: background-color 2.0s ease;
 }
 
-    body:not(.relax-mode):not(.stress-mode) {
-        background: linear-gradient(-45deg, #fcff43, #ff9a9e, #91f5a0, #a18cd1);
-        background-size: 400% 400%;
-        animation: gradientMove 10s ease infinite;
-    }
-
 body.relax-mode {
     background: #69fb7e;
-    animation: none;
 }
 
 body.stress-mode {
     background: #c20000;
-    animation: none;
 }
 
-#modeSelect button {
+h1 {
+    font-size: 2.5em;
+    margin-bottom: 20px;
+}
+
+p {
+    font-size: 1.1em;
+}
+
+button {
+    display: block;
+    margin: 12px auto;
+    padding: 15px;
+    width: 280px;
     font-size: 1.2em;
-    border-radius: 12px;
+    border-radius: 999px;
     border: none;
+    cursor: pointer;
+    font-weight: bold;
+
     transition: all 0.2s ease;
 }
-
-#modeSelect button:hover {
+button:hover {
     transform: scale(1.05);
     box-shadow: 0 5px 15px rgba(0,0,0,0.2);
 }
@@ -44,12 +52,70 @@ body.stress-mode {
     background-color: #ff6b6b;
 }
 
-#restart {
-    margin-top: 20px;
+#modeSelect {
+    margin-top: 40px;
+}
+
+#questionOptions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    justify-content: center;
+    max-width: 600px;
+    margin: 20px auto;
+}
+
+    .qBtn {
+        width: 100%;
+        background-color: white;
+    }
+
+    .qBtn.selected {
+    background-color: rgb(1, 84, 8);
+    color: white;
 }
 
 #answers {
-    transition: opacity 0.5s ease;
+    opacity: 1;
+}
+
+
+#answers button {
+    background-color: white;
+}
+
+#answers.show {
+    opacity: 1;
+}
+
+.answers-locked button:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+button.selected-answer {
+    outline: 4px solid #333;
+}
+
+button.correct {
+    background-color: #4CAF50;
+    color: white;
+}
+
+button.incorrect {
+    background-color: #e74c3c;
+    color: white;
+}
+
+
+#startBtn,
+#restart {
+    background-color: white;
+    font-weight: bold;
+}
+
+#restart {
+    margin-top: 20px;
 }
 
 #resultsTable table {
@@ -94,15 +160,4 @@ body.stress-mode {
 
 #loadingOverlay.active {
     pointer-events: all;
-}
-
-.qBtn.selected {
-    background-color: rgb(1, 84, 8);
-    color: white;
-}
-
-@keyframes gradientMove {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
 }
