@@ -82,6 +82,7 @@ button:hover {
 
 #answers button {
     background-color: white;
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 #answers.show {
@@ -98,12 +99,12 @@ button.selected-answer {
 }
 
 button.correct {
-    background-color: #4CAF50;
+    background-color: #4CAF50 !important;
     color: white;
 }
 
 button.incorrect {
-    background-color: #e74c3c;
+    background-color: #e74c3c !important;
     color: white;
 }
 
