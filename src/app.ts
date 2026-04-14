@@ -155,10 +155,12 @@ restartBtn.onclick = () => {
 };
 
 relaxBtn.onclick = () => {
+    playSound(clickSfx);
     playSound(relaxSfx);
     selectMode("relax");
 };
 stressBtn.onclick = () => {
+    playSound(clickSfx);
     playSound(stressSfx);
     selectMode("stress");
 };
