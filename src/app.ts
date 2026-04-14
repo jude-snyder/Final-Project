@@ -17,6 +17,22 @@ console.log(document.getElementById("gameContainer"));
 window.addEventListener("DOMContentLoaded", () => {
      const player = getEl<HTMLAudioElement>("player");
 const endSound = getEl<HTMLAudioElement>("endSound");
+const clickSfx = new Audio("/click.mp3");
+const correctSfx = new Audio("/correct.mp3");
+const wrongSfx = new Audio("/wrong.mp3");
+const relaxSfx = new Audio("/relax.mp3");
+const stressSfx = new Audio("/stress.mp3");
+
+const menuMusic = new Audio("/menu.mp3");
+menuMusic.loop = true;
+menuMusic.volume = 0.5;
+
+document.body.addEventListener("click", () => {
+    if (menuMusic.paused) {
+        menuMusic.play().catch(() => {});
+    }
+}, { once: true });
+
 const answersDiv = getEl<HTMLDivElement>("answers");
 const result = getEl<HTMLParagraphElement>("result");
 const progress = getEl<HTMLParagraphElement>("progress");
@@ -129,10 +145,21 @@ let history: {
     correctAnswer: string;
 }[] = [];
 
-restartBtn.onclick = resetGame;
+restartBtn.onclick = () => {
+    playSound(clickSfx);
+    setTimeout(() => {
+        resetGame();
+    }, 500);
+};
 
-relaxBtn.onclick = () => selectMode("relax");
-stressBtn.onclick = () => selectMode("stress");
+relaxBtn.onclick = () => {
+    playSound(relaxSfx);
+    selectMode("relax");
+};
+stressBtn.onclick = () => {
+    playSound(stressSfx);
+    selectMode("stress");
+};
 
 function selectMode(selected: "relax" | "stress") {
     mode = selected;
@@ -157,6 +184,7 @@ function selectMode(selected: "relax" | "stress") {
 
     qButtons.forEach(btn => {
         btn.onclick = () => {
+            playSound(clickSfx);
             totalQuestions = Number(btn.dataset.q);
 
             qButtons.forEach(b => b.classList.remove("selected"));
@@ -166,10 +194,20 @@ function selectMode(selected: "relax" | "stress") {
         };
     });
 
-    startBtn.onclick = () => startGame();
+    startBtn.onclick = () => {
+        playSound(clickSfx);
+
+        menuMusic.pause();
+        menuMusic.currentTime = 0;
+
+        startGame();
+    }
 };
 
-
+function playSound(sound: HTMLAudioElement) {
+    sound.currentTime = 0;
+    sound.play().catch(() => {});
+}
 
 // Start game with selected mode
 function startGame() {
@@ -327,11 +365,13 @@ async function loadQuestion() {
 
                 // Check answer and update score/streak
                 if (name === correctTrack.artistName) {
+                    playSound(correctSfx);
                     score++;
                     streak++;
                     if (streak > highestStreak) highestStreak = streak;
                     result.textContent = "✅ Correct!";
                 } else {
+                    playSound(wrongSfx);
                     streak = 0;
 
                     result.textContent = `❌ Wrong! It was ${correctTrack.artistName}`;
