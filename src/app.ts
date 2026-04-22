@@ -278,6 +278,28 @@ function startTimer() {
     }, 1000);
 }
 
+function pauseTimer() {
+    if (timerInterval !== null) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+}
+
+function resumeTimer() {
+    if (timerInterval === null && timeLeft > 0) {
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            timerText.textContent = `⏱️ ${formatTime(timeLeft)}`;
+
+            if (timeLeft <= 0) {
+                pauseTimer();
+                timerText.textContent = "⏱️ Time's up";
+                endGame();
+            }
+        }, 1000);
+    }
+}
+
     function endGame() {
         isGameOver = true;
        // Stop music and timer
@@ -303,6 +325,10 @@ function startTimer() {
 // Main game loop
 async function loadQuestion() {
     if (isGameOver) return;
+    
+    if(mode === "stress") {
+        pauseTimer();
+    }
     loadingOverlay.style.display = "flex";
     answersDiv.style.opacity = "0";
     await new Promise(res=>setTimeout(res, 300));
@@ -447,8 +473,18 @@ async function loadQuestion() {
         await new Promise(res => setTimeout(res,50));
         answersDiv.style.opacity = "1";
          loadingOverlay.style.display = "none";
+
+         if (mode === "stress") {
+            resumeTimer();
+         }
     } catch {
         result.textContent = "⚠️ Error loading songs. Retrying...";
+        setTimeout(loadQuestion, 1000);
+
+        if (mode === "stress") {
+            resumeTimer();
+        }
+
         setTimeout(loadQuestion, 1000);
     }
 }
