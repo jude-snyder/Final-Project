@@ -79,6 +79,7 @@ window.addEventListener("DOMContentLoaded", () => {
     let questionNumber = 0
     let totalQuestions = 20
     let usedArtists = new Set<string>();
+    let usedTracks = new Set<string>();
     let score = 0;
     let streak = 0;
     let highestStreak = 0;
@@ -322,8 +323,29 @@ window.addEventListener("DOMContentLoaded", () => {
                 t.trackExplicitness === "notExplicit"
             );
 
-            const correctTrack = getRandomItem(tracks);
+            const normalizeArtist = (name: string) => name.trim().toLowerCase();
+            const isExactArtistMatch = (trackArtist: string, selectedArtist: string) =>
+                normalizeArtist(trackArtist) === normalizeArtist(selectedArtist);
+            const isLikelyCollab = (trackArtist: string) =>
+                /(feat\.|featuring|ft\.|&| with | x | X )/i.test(trackArtist);
 
+            const exactArtistTracks = tracks.filter(track => isExactArtistMatch(track.artistName, artist));
+            const fallbackArtistTracks = tracks.filter(track =>
+                normalizeArtist(track.artistName).includes(normalizeArtist(artist)) &&
+                !isLikelyCollab(track.artistName)
+            );
+
+            const eligibleTracks = exactArtistTracks.length > 0 ? exactArtistTracks : fallbackArtistTracks.length > 0 ? fallbackArtistTracks : tracks;
+            const availableTracks = eligibleTracks.filter(t => {
+                const trackKey = `${t.trackName} - ${t.artistName}`;
+                return !usedTracks.has(trackKey);
+            });
+
+            const trackPool = availableTracks.length > 0 ? availableTracks : eligibleTracks;
+            const correctTrack = getRandomItem(trackPool);
+            usedTracks.add(`${correctTrack.trackName} - ${correctTrack.artistName}`);
+
+            const correctArtist = artist;
             player.src = correctTrack.previewUrl;
             player.currentTime = 0;
 
@@ -335,7 +357,7 @@ window.addEventListener("DOMContentLoaded", () => {
                 result.textContent = "▶️ Press play to hear the clip";
             }
 
-            const options: string[] = [correctTrack.artistName];
+            const options: string[] = [correctArtist];
 
             while (options.length < 4) {
                 const randomArtist = getRandomArtist(ARTISTS);
@@ -360,18 +382,18 @@ window.addEventListener("DOMContentLoaded", () => {
 
                     buttons.forEach(b => b.disabled = true);
 
-                    const isCorrect = name === correctTrack.artistName;
+                    const isCorrect = name === correctArtist;
 
                     // Save to history for results table
                     history.push({
                         track: correctTrack.trackName,
-                        artist: correctTrack.artistName,
+                        artist: correctArtist,
                         userAnswer: name,
-                        correctAnswer: correctTrack.artistName
+                        correctAnswer: correctArtist
                     });
 
                     // Check answer and update score/streak
-                    if (name === correctTrack.artistName) {
+                    if (name === correctArtist) {
                         playSound(correctSfx);
                         score++;
                         streak++;
@@ -381,11 +403,11 @@ window.addEventListener("DOMContentLoaded", () => {
                         playSound(wrongSfx);
                         streak = 0;
 
-                        result.textContent = `❌ Wrong! It was ${correctTrack.artistName}`;
+                        result.textContent = `❌ Wrong! It was ${correctArtist}`;
                     }
 
                     buttons.forEach(b => {
-                        if (b.textContent === correctTrack.artistName) {
+                        if (b.textContent === correctArtist) {
                             b.classList.add("correct");
                             b.classList.add("selected-answer");
                         } else {

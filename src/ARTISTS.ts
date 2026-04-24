@@ -19,7 +19,7 @@
         "Rihanna",
         "Katy Perry",
         "Imagine Dragons",
-        "Twenty One Pilots",
+        "twenty one pilots",
         "Arctic Monkeys",
         "Charlie Puth",
         "David Guetta",
