@@ -1,3 +1,8 @@
+/**
+ * Main entry point for the Music Trivia game.
+ * Handles UI setup, game state, audio playback, and game loop.
+ */
+
 import { getEl } from './get-el';
 import { getRandomItem } from './get-random-item';
 import { getRandomArtist } from './get-random-artist';
@@ -14,19 +19,24 @@ console.log(document.getElementById("gameContainer"));
 
 // Grabs all DOM elements
 window.addEventListener("DOMContentLoaded", () => {
+    /** @type {HTMLAudioElement} */
     const player = getEl<HTMLAudioElement>("player");
+    /** @type {HTMLAudioElement} */
     const endSound = getEl<HTMLAudioElement>("endSound");
+    /** Sound effects */
     const clickSfx = new Audio("/click.mp3");
     const correctSfx = new Audio("/correct.mp3");
     const wrongSfx = new Audio("/wrong.mp3");
     const relaxSfx = new Audio("/relax.mp3");
     const stressSfx = new Audio("/stress.mp3");
 
+    /** Background menu music */
     const menuMusic = new Audio("/menu.mp3");
     menuMusic.loop = true;
     menuMusic.volume = 0.5;
     menuMusic.preload = "auto";
-
+    
+    /** UI elements */
     const answersDiv = getEl<HTMLDivElement>("answers");
     const result = getEl<HTMLParagraphElement>("result");
     const progress = getEl<HTMLParagraphElement>("progress");
@@ -39,6 +49,8 @@ window.addEventListener("DOMContentLoaded", () => {
     const relaxBtn = getEl<HTMLButtonElement>("relaxBtn");
     const stressBtn = getEl<HTMLButtonElement>("stressBtn");
     const backToMenuBtn = getEl<HTMLButtonElement>("backToMenuBtn");
+
+    /** @type {HTMLButtonElement | null} */
     let musicBtn: HTMLButtonElement | null = null;
 
     try {
@@ -61,13 +73,9 @@ window.addEventListener("DOMContentLoaded", () => {
     player.style.display = 'none';
     endSound.style.display = 'none';
 
-    // Random picker helper function
-
-
-    // Shortcut for artists
-
-
-    // Type for iTunes API response
+    /**
+     * iTunes API track type
+     */
     type Track = {
         previewUrl: string;
         artistName: string;
@@ -75,7 +83,7 @@ window.addEventListener("DOMContentLoaded", () => {
         trackExplicitness: string;
     }
 
-    // Game state variables
+    /** Game state variables */
     let questionNumber = 0
     let totalQuestions = 20
     let usedArtists = new Set<string>();
@@ -85,11 +93,12 @@ window.addEventListener("DOMContentLoaded", () => {
     let highestStreak = 0;
     let isGameOver = false;
 
+    /** @type {"relax" | "stress" | null} */
     let mode: "relax" | "stress" | null = null;
     let timeLeft = 300; // 5 minutes in seconds
     let timerInterval: ReturnType<typeof setInterval> | null = null;
 
-    // Store results history for the results table at the end
+    /** @type {HistoryNode[]} */
     let history: HistoryNode[] = [];
 
 
@@ -197,12 +206,21 @@ window.addEventListener("DOMContentLoaded", () => {
         loadQuestion();
     }
 
+    /**
+     * Formants seconds into MM:SS format for the timer display
+     * @param {number} seconds
+     * @returns {string}
+     */
     function formatTime(seconds: number): string {
         const mins = Math.floor(seconds / 60);
         const secs = seconds % 60;
         return `${mins}:${secs.toString().padStart(2, "0")}`;
     }
 
+
+    /**
+     * Starts the countdown timer for Stress Mode.
+     */
     function startTimer() {
         timeLeft = 300;
         timerText.style.display = "block";
@@ -219,6 +237,9 @@ window.addEventListener("DOMContentLoaded", () => {
         }, 1000);
     }
 
+    /**
+     * Pauses the active timer. Used when loading new questions in Stress Mode to give players a break.
+     */
     function pauseTimer() {
         if (timerInterval !== null) {
             clearInterval(timerInterval);
@@ -226,6 +247,9 @@ window.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    /**
+     * Resumes the timer if time remains.
+     */
     function resumeTimer() {
         if (timerInterval === null && timeLeft > 0) {
             timerInterval = setInterval(() => {
@@ -241,6 +265,9 @@ window.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    /**
+     * Ends the game and shows results.
+     */
     function endGame() {
         isGameOver = true;
         // Stop music and timer
@@ -263,7 +290,10 @@ window.addEventListener("DOMContentLoaded", () => {
         confetti();
     }
 
-    // Main game loop
+    /**
+     * Loads and displays a new trivia question.
+     * Handoes fetching songs and generating answers.
+     */
     async function loadQuestion() {
         if (isGameOver) return;
 
@@ -451,7 +481,9 @@ window.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Reset game state and reload page
+    /**
+     * Resets the game by reloading the page.
+     */
     function resetGame() {
         isGameOver = true;
         restartBtn.style.display = "none";
@@ -460,7 +492,9 @@ window.addEventListener("DOMContentLoaded", () => {
         location.reload();
     }
 
-    // Play applause sound at the end of the game
+    /**
+     * Plays the end-of-game applause sound.
+     */
     function playEndSong() {
         endSound.src = "/applause.mp3";
         endSound.currentTime = 0;

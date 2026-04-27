@@ -1,3 +1,7 @@
+/**
+ * Bun server entry point.
+ * Serves static assets and compiled JavaScript bundle for the music trivia game.
+ */
 import path from "node:path";
 
 const index = Bun.file(path.join(process.cwd(), "./src/index.html"));
@@ -10,6 +14,9 @@ const relaxSound = Bun.file(path.join(process.cwd(), "./src/relax.mp3"));
 const stressSound = Bun.file(path.join(process.cwd(), "./src/stress.mp3"));
 const menuMusic = Bun.file(path.join(process.cwd(), "./src/menu.mp3"));
 
+/**
+ * Builds the frontened app using Bun.
+ */
 const result = await Bun.build({
     entrypoints: ["./src/app.ts"],
     target: "browser",
@@ -18,6 +25,9 @@ const result = await Bun.build({
 
 const script = await result.outputs[0]!.text();
 
+/**
+ * Starts the HTTP server.
+ */
 const server = Bun.serve({
     routes: {
         "/": index,

@@ -1,4 +1,9 @@
-   export const ARTISTS = [
+  /**
+   * List of artists used for trivia questions.
+   * @type {string[]}
+   */
+  
+  export const ARTISTS = [
         "Taylor Swift",
         "Drake",
         "The Weeknd",
