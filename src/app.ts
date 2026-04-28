@@ -33,8 +33,18 @@ window.addEventListener("DOMContentLoaded", () => {
     /** Background menu music */
     const menuMusic = new Audio("/menu.mp3");
     menuMusic.loop = true;
-    menuMusic.volume = 0.5;
+    menuMusic.volume = 1;
     menuMusic.preload = "auto";
+
+    const relaxResultsMusic = new Audio("/relax-results.mp3");
+    relaxResultsMusic.loop = true;
+    relaxResultsMusic.volume = 1;
+    relaxResultsMusic.preload = "auto";
+
+    const stressResultsMusic = new Audio("/stress-results.mp3");
+    stressResultsMusic.loop = true;
+    stressResultsMusic.volume = 1;
+    stressResultsMusic.preload = "auto";
     
     /** UI elements */
     const answersDiv = getEl<HTMLDivElement>("answers");
@@ -273,6 +283,13 @@ window.addEventListener("DOMContentLoaded", () => {
         // Stop music and timer
         player.pause();
         player.currentTime = 0;
+
+        menuMusic.pause();
+        menuMusic.currentTime = 0;
+
+        relaxResultsMusic.pause();
+        stressResultsMusic.pause();
+        
         if (timerInterval !== null) {
             clearInterval(timerInterval);
         }
@@ -288,6 +305,14 @@ window.addEventListener("DOMContentLoaded", () => {
         showResultsTable(score, mode, totalQuestions, highestStreak, history, resultsTable);
         playEndSong();
         confetti();
+
+        if (mode === "relax") {
+            relaxResultsMusic.currentTime = 0;
+            relaxResultsMusic.play().catch(() => { });
+        } else if (mode === "stress") {
+            stressResultsMusic.currentTime = 0;
+            stressResultsMusic.play().catch(() => { });
+        }
     }
 
     /**
@@ -314,6 +339,10 @@ window.addEventListener("DOMContentLoaded", () => {
             showResultsTable(score, mode, totalQuestions, highestStreak, history, resultsTable);
             playEndSong();
             confetti();
+            relaxResultsMusic.currentTime = 0;
+            relaxResultsMusic.play().catch(err => {
+                console.error("Relax results music failed to play:", err);
+            });
             loadingOverlay.style.display = "none";
             return;
         }
@@ -486,9 +515,17 @@ window.addEventListener("DOMContentLoaded", () => {
      */
     function resetGame() {
         isGameOver = true;
+       
+        relaxResultsMusic.pause();
+        relaxResultsMusic.currentTime = 0;
+       
+        stressResultsMusic.pause();
+        stressResultsMusic.currentTime = 0;
+        
         restartBtn.style.display = "none";
         document.body.classList.remove("relax-mode", "stress-mode");
         document.body.style.background = "";
+        
         location.reload();
     }
 
@@ -499,6 +536,7 @@ window.addEventListener("DOMContentLoaded", () => {
         endSound.src = "/applause.mp3";
         endSound.currentTime = 0;
         endSound.muted = false;
+        endSound.volume = 0.6;
 
         endSound.play().catch(() => { });
     }

@@ -13,6 +13,8 @@ const wrongSound = Bun.file(path.join(process.cwd(), "./src/wrong.mp3"));
 const relaxSound = Bun.file(path.join(process.cwd(), "./src/relax.mp3"));
 const stressSound = Bun.file(path.join(process.cwd(), "./src/stress.mp3"));
 const menuMusic = Bun.file(path.join(process.cwd(), "./src/menu.mp3"));
+const relaxResultsMusic = Bun.file(path.join(process.cwd(), "./src/relax-results.mp3"));
+const stressResultsMusic = Bun.file(path.join(process.cwd(), "./src/stress-results.mp3"));
 
 /**
  * Builds the frontened app using Bun.
@@ -49,6 +51,8 @@ const server = Bun.serve({
         "/relax.mp3": relaxSound,
         "/stress.mp3": stressSound,
         "/menu.mp3": menuMusic,
+        "/relax-results.mp3": relaxResultsMusic,
+        "/stress-results.mp3": stressResultsMusic,
     },
 });
 
