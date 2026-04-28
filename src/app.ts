@@ -24,9 +24,12 @@ window.addEventListener("DOMContentLoaded", () => {
     /** @type {HTMLAudioElement} */
     const endSound = getEl<HTMLAudioElement>("endSound");
     /** Sound effects */
+    player.volume = 0.4;
     const clickSfx = new Audio("/click.mp3");
     const correctSfx = new Audio("/correct.mp3");
+    correctSfx.volume = 0.8;
     const wrongSfx = new Audio("/wrong.mp3");
+    wrongSfx.volume = 0.7;
     const relaxSfx = new Audio("/relax.mp3");
     const stressSfx = new Audio("/stress.mp3");
 
